@@ -12,9 +12,11 @@ public class Main{
 	 */
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		System.out.println("Hello world!");
-		Socket sock=new Socket("88.162.36.15", 21126);
-		PiFTP pi=new PiFTP(sock.getInputStream(), sock.getOutputStream());
-		Thread thread=new Thread(pi);
+		//Socket sockPi=new Socket("88.162.36.15", 21126);
+		Socket sockDtp=new Socket("localhost", 39775);
+		/*
+		PiFTP pi=new PiFTP(sockPi.getInputStream(), sockPi.getOutputStream());
+		Thread threadPi=new Thread(pi);
 		
 		pi.addLisener(new PiFTPListener() {
 			@Override
@@ -23,8 +25,12 @@ public class Main{
 				
 			}
 		});
+		*/
+		DtpFTP dtp=new DtpFTP(sockDtp.getInputStream(), sockDtp.getOutputStream());
+		Thread threadDt=new Thread(dtp);
 		
-		thread.start();
-		pi.connect("yapiti", "");
+		//threadPi.start();
+		threadDt.start();
+		//pi.connect("yapiti");
 	}
 }
