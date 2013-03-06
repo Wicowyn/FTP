@@ -9,14 +9,13 @@ public class Main{
 	 * @param args
 	 * @throws IOException 
 	 * @throws UnknownHostException 
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws UnknownHostException, IOException {
+	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		System.out.println("Hello world!");
-		//Socket sockPi=new Socket("88.162.36.15", 21126);
-		Socket sockDtp=new Socket("localhost", 39775);
-		/*
+		Socket sockPi=new Socket(args[0], Integer.parseInt(args[1]));
+		
 		PiFTP pi=new PiFTP(sockPi.getInputStream(), sockPi.getOutputStream());
-		Thread threadPi=new Thread(pi);
 		
 		pi.addLisener(new PiFTPListener() {
 			@Override
@@ -24,13 +23,22 @@ public class Main{
 				System.out.println(msg);
 				
 			}
+
+			@Override
+			public void connected() {
+				System.out.println("connected :)");
+				
+			}
+
+			@Override
+			public void disconnected() {
+				System.out.println("diconnected :(");
+				
+			}
 		});
-		*/
-		DtpFTP dtp=new DtpFTP(sockDtp.getInputStream(), sockDtp.getOutputStream());
-		Thread threadDt=new Thread(dtp);
+		Thread.sleep(500);
+		System.out.println(pi.connect(args[2], args[3]));
 		
-		//threadPi.start();
-		threadDt.start();
-		//pi.connect("yapiti");
+		sockPi.close();
 	}
 }
