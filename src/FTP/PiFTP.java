@@ -176,6 +176,18 @@ public class PiFTP{
 		return true;
 	}
 	
+	public boolean delete(FTPFile file){
+		try {
+			if(!command("DELE "+new String(file.getAbsPath().getBytes(), "UTF-8")).startsWith("250")) return false;
+			
+			file.getAbsPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;		
+		}
+		return true;
+	}
+	
 	public InputStream download(FTPFile file){
 		if(this.type!=Type.I) if(!setMode(Type.I)) return null;
 		Socket sock=PASV();
