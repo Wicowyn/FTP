@@ -1,3 +1,21 @@
+/*//////////////////////////////////////////////////////////////////////
+	This file is part of FTP, an client FTP.
+	Copyright (C) 2013  Nicolas Barranger <wicowyn@gmail.com>
+
+    FTP is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FTP is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FTP.  If not, see <http://www.gnu.org/licenses/>.
+*///////////////////////////////////////////////////////////////////////
+
 package FTP;
 
 import java.io.BufferedReader;
@@ -21,6 +39,7 @@ public class PiFTP{
 	private BufferedReader in;
 	private BufferedWriter out;
 	private boolean connected=false;
+	private Type type;
 	
 	
 	public PiFTP(InputStream in, OutputStream out) throws IOException{
@@ -48,13 +67,13 @@ public class PiFTP{
 		return true;
 	}
 	
-	public List<FTPFile> getFiles(String path){
+	public synchronized List<FTPFile> getFiles(String path){
 		List<FTPFile> list=new ArrayList<FTPFile>();
 		List<String> listName=new ArrayList<String>(), listInfo=new ArrayList<String>();
 		Socket sock=null;
 		BufferedReader read=null;
 		
-		
+		if(this.type!=Type.A) if(!setMode(Type.A)) return list;
 		try {
 			sock=PASV();
 			if(sock==null) return list;
@@ -113,7 +132,8 @@ public class PiFTP{
 				}
 				
 				String abs=listName.get(i);
-				file.path=abs.substring(0, abs.lastIndexOf('/')-1);
+				int lastSlash=abs.lastIndexOf('/');
+				file.path= lastSlash<1 ? "" : abs.substring(0, lastSlash-1);
 				file.name=abs.substring(abs.lastIndexOf('/')+1, abs.length());				
 				list.add(file);
 			}
@@ -154,6 +174,23 @@ public class PiFTP{
 		}
 		
 		return true;
+	}
+	
+	public InputStream download(FTPFile file){
+		if(this.type!=Type.I) if(!setMode(Type.I)) return null;
+		Socket sock=PASV();
+		if(sock==null) return null;
+		
+		try {
+			String log=command("RETR "+new String(file.getAbsPath().getBytes(), "UTF-8"));
+			
+			if(log.startsWith("125") || log.startsWith("150") || log.startsWith("350"))
+					return sock.getInputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	protected Socket PASV(){
@@ -214,6 +251,23 @@ public class PiFTP{
 		return str==null ? new String() : str;
 	}
 	
+	protected boolean setMode(Type type){
+		try {
+			if(command("TYPE "+type).startsWith("200")){
+				this.type=type;
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+		return false;		
+	}
+	
+	public Type getType(){
+		return this.type;
+	}
+	
 	protected void setInputream(InputStream in){
 		try {
 			if(this.in!=null) this.in.close();
@@ -259,4 +313,9 @@ public class PiFTP{
 	protected void notifyDisconnected(){
 		for(PiFTPListener listener : this.listeners) listener.disconnected();
 	}
+	
+	private enum Type{
+		A, E, I, L
+	}
+	
 }
