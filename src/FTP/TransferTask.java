@@ -22,10 +22,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.omg.CORBA.portable.OutputStream;
 
 public class TransferTask implements Runnable {
 	private List<TransferTaskListener> listeners=new ArrayList<TransferTaskListener>();
