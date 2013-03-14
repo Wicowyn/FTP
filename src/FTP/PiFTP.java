@@ -177,6 +177,42 @@ public class PiFTP{
 		return true;
 	}
 	
+	public InputStream download(FTPFile file){
+		InputStream in=null;
+		if(this.type!=Type.I) if(!setMode(Type.I)) return in;
+		Socket sock=PASV();
+		if(sock==null) return null;
+		
+		try {
+			String log=command("RETR "+new String(file.getAbsPath().getBytes(), "UTF-8"));
+			
+			if(log.startsWith("125") || log.startsWith("150") || log.startsWith("350"))
+					in=sock.getInputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return in;
+	}
+	
+	public OutputStream upload(String absPath){
+		OutputStream out=null;
+		if(this.type!=Type.I) if(!setMode(Type.I)) return out;
+		Sock sock=PASV();
+		if(sock==null) return null;
+		
+		try {
+			String log=command("STOR "+new String(absPath.getBytes(), "UTF-8"));
+			
+			if(log.startsWith("125") || log.startsWith("150"))
+					out=sock.getOutputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return out;
+	}
+
 	public boolean delete(FTPFile file){
 		try {
 			if(!command("DELE "+new String(file.getAbsPath().getBytes(), "UTF-8")).startsWith("250")) return false;
@@ -187,43 +223,9 @@ public class PiFTP{
 		}
 		return true;
 	}
-	
-	public InputStream download(FTPFile file){
-		if(this.type!=Type.I) if(!setMode(Type.I)) return null;
-		Socket sock=PASV();
-		if(sock==null) return null;
-		
-		try {
-			String log=command("RETR "+new String(file.getAbsPath().getBytes(), "UTF-8"));
-			
-			if(log.startsWith("125") || log.startsWith("150") || log.startsWith("350"))
-					return sock.getInputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	public OutputStream upload(String absPath){
-		if(this.type!=Type.I) if(!setMode(Type.I)) return null;
-		Socket sock=PASV();
-		if(sock==null) return null;
-		
-		try {
-			String log=command("STOR "+new String(absPath.getBytes(), "UTF-8"));
-			
-			if(log.startsWith("125") || log.startsWith("150"))
-					return sock.getOutputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	protected Socket PASV(){
-		Socket sock=null;	
+
+	protected Sock PASV(){
+		Sock sock=null;	
 		String log;
 		
 		try {
@@ -234,7 +236,7 @@ public class PiFTP{
 				String host=tab[0]+"."+tab[1]+"."+tab[2]+"."+tab[3];
 				int port=(Integer.parseInt(tab[4])<<8)+Integer.parseInt(tab[5]);
 				
-				sock=new Socket(host, port);
+				sock=new Sock(host, port);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

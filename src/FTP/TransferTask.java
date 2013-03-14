@@ -51,6 +51,9 @@ public class TransferTask implements Runnable {
 				this.out.write(buff, 0, read);
 				read=this.in.read(buff);
 			}
+			
+			in.close();
+			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
