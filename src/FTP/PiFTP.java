@@ -120,6 +120,7 @@ public class PiFTP{
 				FTPFile file=new FTPFile();
 				String[] info=listInfo.get(i).split(" +"); //regex: un espace ou plus
 				
+				file.exist=true;
 				file.duty=info[0];
 				file.owner=info[2];
 				file.ownerGroup=info[3];
@@ -179,8 +180,7 @@ public class PiFTP{
 	public boolean delete(FTPFile file){
 		try {
 			if(!command("DELE "+new String(file.getAbsPath().getBytes(), "UTF-8")).startsWith("250")) return false;
-			
-			file.getAbsPath();
+			file.exist=false;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;		
@@ -198,6 +198,23 @@ public class PiFTP{
 			
 			if(log.startsWith("125") || log.startsWith("150") || log.startsWith("350"))
 					return sock.getInputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public OutputStream upload(String absPath){
+		if(this.type!=Type.I) if(!setMode(Type.I)) return null;
+		Socket sock=PASV();
+		if(sock==null) return null;
+		
+		try {
+			String log=command("STOR "+new String(absPath.getBytes(), "UTF-8"));
+			
+			if(log.startsWith("125") || log.startsWith("150"))
+					return sock.getOutputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

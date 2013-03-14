@@ -33,6 +33,7 @@ public class FTPFile {
 	protected String name;
 	protected String path;
 	protected Date date;
+	boolean exist=false;
 	
 	
 	protected FTPFile(){
@@ -53,6 +54,10 @@ public class FTPFile {
 	
 	public boolean isDirectory(){
 		return this.duty.startsWith("d");
+	}
+	
+	public boolean exist(){
+		return this.exist;
 	}
 	
 	public boolean isSimlik(){
