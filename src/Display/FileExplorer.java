@@ -2,7 +2,6 @@ package Display;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +15,21 @@ public abstract class FileExplorer extends JPanel{
 	private List<FileExplorerListener> listeners=new ArrayList<FileExplorerListener>();
 	protected DefaultListModel<String> model=new DefaultListModel<String>();
 	protected JList<String> list=new JList<String>(this.model);
-	protected String path;
+	protected String path=new String();
 	
 	
-	public FileExplorer(String path){
+	public FileExplorer(){
 		this.list.addMouseListener(new ListenMouse());
 		this.add(new JScrollPane(this.list));
-		setPath(path);
+	}
+	
+	public String getCurrentPath(){
+		return this.path;
 	}
 	
 	public abstract void setPath(String path);
+	
+	protected abstract void selected(int index);
 	
 	public void addListener(FileExplorerListener listener){
 		this.listeners.add(listener);
@@ -51,22 +55,7 @@ public abstract class FileExplorer extends JPanel{
 			this.nbClick++;
 			if(this.nbClick==2){
 				this.nbClick=0;
-				String path=FileExplorer.this.path;
-				String name=FileExplorer.this.model.get(index);
-				
-				if(name.equals("..")){
-					path=path.substring(0, path.lastIndexOf("/"));
-					FileExplorer.this.setPath(path);
-				}
-				else{
-					path=path+"/"+FileExplorer.this.model.get(index);
-					File file=new File(path);
-					if(file.isDirectory()){
-						FileExplorer.this.setPath(path);
-					}
-					
-					FileExplorer.this.notifySelectedFile(path);
-				}
+				FileExplorer.this.selected(index);
 			}
 			
 		}

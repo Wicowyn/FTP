@@ -198,7 +198,7 @@ public class PiFTP{
 	public OutputStream upload(String absPath){
 		OutputStream out=null;
 		if(this.type!=Type.I) if(!setMode(Type.I)) return out;
-		Sock sock=PASV();
+		Socket sock=PASV();
 		if(sock==null) return null;
 		
 		try {
@@ -224,8 +224,8 @@ public class PiFTP{
 		return true;
 	}
 
-	protected Sock PASV(){
-		Sock sock=null;	
+	protected Socket PASV(){
+		Socket sock=null;	
 		String log;
 		
 		try {
@@ -236,7 +236,7 @@ public class PiFTP{
 				String host=tab[0]+"."+tab[1]+"."+tab[2]+"."+tab[3];
 				int port=(Integer.parseInt(tab[4])<<8)+Integer.parseInt(tab[5]);
 				
-				sock=new Sock(host, port);
+				sock=new Socket(host, port);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

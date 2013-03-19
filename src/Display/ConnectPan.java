@@ -20,7 +20,9 @@ public class ConnectPan extends JPanel{
 	private JTextField login=new JTextField();
 	private JPasswordField passwd=new JPasswordField();
 	private JFormattedTextField host=new JFormattedTextField();
-	private JFormattedTextField port=new JFormattedTextField(new DecimalFormat("Integer"));
+	private JFormattedTextField port=new JFormattedTextField(DecimalFormat.getIntegerInstance());
+	private JButton button=new JButton("Connetion");
+	private boolean enabled=true;
 	
 	public ConnectPan(){
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -33,10 +35,24 @@ public class ConnectPan extends JPanel{
 		add(new JLabel("Port: "));
 		add(this.port);
 		
-		JButton button=new JButton("Connection");
-		button.addMouseListener(new ConnListener());
-		add(button);
+		this.button=new JButton("Connection");
+		this.button.addMouseListener(new ConnListener());
+		add(this.button);
 	
+	}
+	
+	public void setEnabled(boolean enable){
+		this.login.setEnabled(enable);
+		this.passwd.setEnabled(enable);
+		this.host.setEnabled(enable);
+		this.port.setEnabled(enable);
+		
+		this.button.setName(enable ? "Connection" : "Deconnection");
+		this.button.updateUI();
+	}
+	
+	public boolean isEnable(){
+		return this.enabled;
 	}
 	
 	public void addListener(ConnectListener listener){
@@ -47,20 +63,26 @@ public class ConnectPan extends JPanel{
 		return this.listeners.remove(listener);
 	}
 	
-	protected void notifyConnect(String login, char[] passwd, String host, int port){
+	protected void notifyConnect(String login, char[] passwd, String host, long port){
 		for(ConnectListener listener : this.listeners) listener.needConnect(login, passwd, host, port);
+	}
+	
+	protected void notifyDisconnect(){
+		for(ConnectListener listener : this.listeners) listener.needDisconnect();
 	}
 	
 	private class ConnListener implements MouseListener{
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			ConnectPan.this.notifyConnect(
-					ConnectPan.this.login.getText(),
-					ConnectPan.this.passwd.getPassword(),
-					ConnectPan.this.host.getText(),
-					(int) ConnectPan.this.port.getValue());
-			
+			if(ConnectPan.this.isEnable()){
+				ConnectPan.this.notifyConnect(
+						ConnectPan.this.login.getText(),
+						ConnectPan.this.passwd.getPassword(),
+						ConnectPan.this.host.getText(),
+						(Long) ConnectPan.this.port.getValue());
+			}
+			else ConnectPan.this.notifyDisconnect();
 		}
 
 		@Override
