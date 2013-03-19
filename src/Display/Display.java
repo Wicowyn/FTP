@@ -1,13 +1,16 @@
 package Display;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.io.File;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -19,6 +22,7 @@ public class Display extends JFrame {
 	private JTree treeLocal=new JTree(this.rootLocal);
 	private DefaultMutableTreeNode rootFTP=new DefaultMutableTreeNode();
 	private JTree treeFTP=new JTree(this.rootFTP);
+	private FileExplorerLocal expLocal=new FileExplorerLocal();
 	
 	public Display(){
 		JPanel pan=new JPanel();
@@ -33,22 +37,18 @@ public class Display extends JFrame {
 		panTree.setLayout(new BoxLayout(panTree, BoxLayout.X_AXIS));
 		panTree.add(this.treeLocal);
 		panTree.add(this.treeFTP);
+		panTree.add(this.expLocal);
 		pan.add(panTree);	
 		
 		this.treeLocal.addTreeSelectionListener(new TreeLocalListener());
 		this.treeFTP.addTreeSelectionListener(new TreeFTPListener());
-		showLocal("/home/yapiti");
+		showLocal("/home/yapiti");	
+		
 		
 	}
 	
 	private void showLocal(String path){
-		File fileRoot=new File(path);
-		this.rootLocal.removeAllChildren();
 		
-		for(File file : fileRoot.listFiles()){
-			DefaultMutableTreeNode node=new DefaultMutableTreeNode(file.getName());
-			this.rootLocal.add(node);
-		}
 		
 		
 	}
