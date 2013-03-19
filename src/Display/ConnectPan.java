@@ -24,7 +24,6 @@ public class ConnectPan extends JPanel{
 	
 	public ConnectPan(){
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		//this.login.setSize(150, this.login.getHeight());
 		add(new JLabel("Login: "));
 		add(this.login);
 		add(new JLabel("Mot de passe: "));

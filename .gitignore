@@ -5,6 +5,4 @@
 *.war
 *.ear
 
-src/Main.java
-
 /bin
