@@ -18,6 +18,7 @@
 
 package Display;
 
+import java.awt.BorderLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public abstract class FileExplorer extends JPanel{
 	private static final long serialVersionUID = -5471662006897342640L;
@@ -37,8 +37,9 @@ public abstract class FileExplorer extends JPanel{
 	
 	
 	public FileExplorer(){
+		setLayout(new BorderLayout());
 		this.list.addMouseListener(new ListenMouse());
-		this.add(new JScrollPane(this.list));
+		this.add(this.list);
 	}
 	
 	public String getCurrentPath(){
@@ -80,25 +81,25 @@ public abstract class FileExplorer extends JPanel{
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
+			//Todo nothing
 			
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
+			//Todo nothing
 			
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
+			//Todo nothing
 			
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
+			//Todo nothing
 			
 		}
 		

@@ -25,7 +25,6 @@ import FTP.PiFTP;
 
 public class FileExplorerFTP extends FileExplorer {
 	private static final long serialVersionUID = 5350246563844990461L;
-	//private List<FTPFile> files=new ArrayList<FTPFile>();
 	private PiFTP pi=null;
 
 	public FileExplorerFTP() {
@@ -36,7 +35,6 @@ public class FileExplorerFTP extends FileExplorer {
 	public void setPath(String path) {
 		this.path=path;
 		this.model.clear();
-		//this.files.clear();
 		if(this.pi==null) return;
 		
 		List<FTPFile> files=this.pi.getFiles(path);
@@ -49,7 +47,6 @@ public class FileExplorerFTP extends FileExplorer {
 	public void setPiFTP(PiFTP pi){
 		this.pi=pi;
 		this.model.clear();
-		//this.files.clear();
 	}
 	
 	public PiFTP getPiFTP(){
@@ -65,7 +62,7 @@ public class FileExplorerFTP extends FileExplorer {
 		else{
 			String path=this.path+"/"+this.model.get(index);
 			FTPFile file=this.pi.getFile(path);
-			
+			System.out.println(path);
 			if(file.isDirectory()){
 				setPath(file.getAbsPath());
 			}

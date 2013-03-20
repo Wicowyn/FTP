@@ -47,11 +47,6 @@ public class PiFTP{
 	private Type type;
 	
 	
-	public PiFTP(InputStream in, OutputStream out) throws IOException{
-		setInputStream(in);
-		setOutputStream(out);		
-	}
-	
 	/**
 	 * Try to logging
 	 * @param id login of user
@@ -105,7 +100,6 @@ public class PiFTP{
 			read.close();
 			sock.close();
 			
-			//while(!this.in.ready()) try { Thread.sleep(150); } catch (InterruptedException e1) {}
 			str=this.in.readLine();
 			notifyReceiveMsg(str);
 			if(!str.startsWith("226")) return list;
@@ -124,7 +118,6 @@ public class PiFTP{
 			read.close();
 			sock.close();
 			
-			//while(!this.in.ready()) try { Thread.sleep(150); } catch (InterruptedException e1) {}
 			str=this.in.readLine();
 			notifyReceiveMsg(str);
 			if(!str.startsWith("226")) return list;
@@ -146,7 +139,7 @@ public class PiFTP{
 				try {
 					file.date=parseDTF.parse("2013 "+info[5]+" "+info[6]+" "+info[7]);
 				} catch (ParseException e) {
-					e.printStackTrace();
+					System.err.println(e.getMessage());
 					file.date=new Date();
 				}				
 				
@@ -194,10 +187,7 @@ public class PiFTP{
 		
 		if(index!=-1){
 			List<FTPFile> list=getFiles(path.substring(0, path.lastIndexOf("/")));
-			for(FTPFile fl : list){
-				System.out.println(fl.getAbsPath()+" - "+path);
-				if(fl.getAbsPath().equals(path)) fileR=fl;
-			}
+			for(FTPFile fl : list) if(fl.getAbsPath().equals(path)) fileR=fl;
 		}
 		
 		return fileR;
@@ -265,7 +255,7 @@ public class PiFTP{
 	 */
 	public OutputStream upload(String absPath){
 		OutputStream out=null;
-		if(this.type!=Type.I) if(!setMode(Type.I)) return out;
+		if(this.type!=Type.I && !setMode(Type.I)) return out;
 		Socket sock=PASV();
 		if(sock==null) return null;
 		
@@ -323,7 +313,7 @@ public class PiFTP{
 	}
 	
 	/**
-	 * We are connected?
+	 * We are connected? May be...
 	 * @return yes or no
 	 */
 	public boolean isConnected(){

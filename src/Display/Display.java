@@ -32,17 +32,18 @@ import java.net.UnknownHostException;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import FTP.FTPFile;
 import FTP.PiFTP;
-import FTP.PiFTPListener;
 import FTP.TransferTask;
 
 public class Display extends JFrame {
 	private static final long serialVersionUID = -17473638218276059L;
-	private PiFTP pi;
+	private PiFTP pi=new PiFTP();
 	private Socket sock;
 	private ConnectPan conn=new ConnectPan();
+	private LogFTP log=new LogFTP();
 	private FileExplorerLocal expLocal=new FileExplorerLocal();
 	private FileExplorerFTP expFTP=new FileExplorerFTP();
 	private ShowProgress progress=new ShowProgress();
@@ -52,16 +53,26 @@ public class Display extends JFrame {
 		pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
 		setContentPane(pan);
 		
-		this.conn.setPreferredSize(new Dimension(600, 25));
+		this.conn.setPreferredSize(new Dimension(800, 30));
 		pan.add(this.conn);		
+		
+		this.pi.addLisener(this.log);
+		this.log.setPreferredSize(new Dimension(800, 150));
+		add(this.log);
 		
 		JPanel panTree=new JPanel();
 		panTree.setLayout(new BoxLayout(panTree, BoxLayout.X_AXIS));
-		panTree.add(this.expLocal);
-		panTree.add(this.expFTP);
+		JScrollPane scLocal=new JScrollPane(this.expLocal);
+		JScrollPane scFTP=new JScrollPane(this.expFTP);
+		scLocal.setPreferredSize(new Dimension(400, 560));
+		scFTP.setPreferredSize(new Dimension(400, 560));
+		panTree.add(scLocal);
+		panTree.add(scFTP);
 		pan.add(panTree);	
 		
-		pan.add(this.progress);
+		JScrollPane scProgress=new JScrollPane(this.progress);
+		scProgress.setPreferredSize(new Dimension(800, 100));
+		pan.add(scProgress);
 		
 		this.conn.addListener(new ListenConnect());
 		this.expLocal.addListener(new ListenExpLocal());
@@ -128,36 +139,11 @@ public class Display extends JFrame {
 				BufferedReader read=new BufferedReader(new InputStreamReader(sock.getInputStream()));
 				read.readLine(); //To clear the reply of welcome..., but we should find another way.
 				
-				PiFTP pi=new PiFTP(sock.getInputStream(), sock.getOutputStream());
-				pi.addLisener(new PiFTPListener() {
-					
-					@Override
-					public void sendMsg(String msg) {
-						System.out.println("send: "+msg);
-						
-					}
-					
-					@Override
-					public void receiveMsg(String msg) {
-						System.out.println("recv: "+msg);
-						
-					}
-					
-					@Override
-					public void disconnected() {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void connected() {
-						// TODO Auto-generated method stub
-						
-					}
-				});
-				if(pi.connect(login, new String(passwd))){
+				Display.this.pi.setInputStream(sock.getInputStream());
+				Display.this.pi.setOutputStream(sock.getOutputStream());
+				
+				if(Display.this.pi.connect(login, new String(passwd))){
 					Display.this.conn.setEnabled(false);
-					Display.this.pi=pi;
 					Display.this.sock=sock;
 					Display.this.expFTP.setPiFTP(pi);
 					Display.this.expFTP.setPath("");
@@ -175,7 +161,6 @@ public class Display extends JFrame {
 
 		@Override
 		public void needDisconnect() {
-			Display.this.pi=null;
 			Display.this.expFTP.setPiFTP(null);
 			
 			if(Display.this.sock!=null){
@@ -186,6 +171,8 @@ public class Display extends JFrame {
 				}
 				Display.this.sock=null;
 			}
+			
+			Display.this.conn.setEnabled(true);
 		}
 		
 	}

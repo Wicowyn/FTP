@@ -37,9 +37,9 @@ import javax.swing.JTextField;
 public class ConnectPan extends JPanel{
 	private static final long serialVersionUID = 4707425225997730750L;
 	private List<ConnectListener> listeners=new ArrayList<ConnectListener>();
-	private JTextField login=new JTextField();
-	private JPasswordField passwd=new JPasswordField();
-	private JFormattedTextField host=new JFormattedTextField();
+	private JTextField login=new JTextField("yapiti");
+	private JPasswordField passwd=new JPasswordField("7sx6q8fs");
+	private JFormattedTextField host=new JFormattedTextField("192.168.0.126");
 	private JFormattedTextField port=new JFormattedTextField(DecimalFormat.getIntegerInstance());
 	private JButton button=new JButton("Connetion");
 	private boolean enabled=true;
@@ -61,8 +61,10 @@ public class ConnectPan extends JPanel{
 		this.host.addKeyListener(lst);
 		this.port.addKeyListener(lst);
 		
+		this.port.setValue(new Long(21));
+		
 		this.button=new JButton("Connection");
-		button.setEnabled(false);
+		button.setEnabled(true);
 		this.button.addMouseListener(new ConnListener());
 		add(this.button);
 	
@@ -75,6 +77,8 @@ public class ConnectPan extends JPanel{
 		this.port.setEnabled(enable);
 		
 		this.button.setText(enable ? "Connection" : "Deconnection");
+		
+		this.enabled=enable;
 	}
 	
 	public boolean isEnable(){
@@ -101,7 +105,7 @@ public class ConnectPan extends JPanel{
 
 		@Override
 		public void keyPressed(KeyEvent e) {
-			// TODO Auto-generated method stub
+			//Todo nothing
 			
 		}
 
@@ -111,14 +115,13 @@ public class ConnectPan extends JPanel{
 			if(th.isEnable()) th.button.setEnabled(!th.login.getText().isEmpty() 
 					&& th.passwd.getPassword().length!=0
 					&& !th.host.getText().isEmpty()
-					&& !th.port.getText().isEmpty());
+					&& th.port.getValue()!=null);
 			
 		}
 
 		@Override
 		public void keyTyped(KeyEvent e) {
-			// TODO Auto-generated method stub
-			
+			//Todo nothing
 		}
 		
 	}
@@ -139,21 +142,25 @@ public class ConnectPan extends JPanel{
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
+			//Todo nothing
 			
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
+			//Todo nothing
 			
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			//Todo nothing
 			
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+			//Todo nothing
 			
 		}
 		
