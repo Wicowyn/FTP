@@ -18,6 +18,8 @@
 
 package Display;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
@@ -53,7 +55,14 @@ public class ConnectPan extends JPanel{
 		add(new JLabel("Port: "));
 		add(this.port);
 		
+		ListenText lst=new ListenText();
+		this.login.addKeyListener(lst);
+		this.passwd.addKeyListener(lst);
+		this.host.addKeyListener(lst);
+		this.port.addKeyListener(lst);
+		
 		this.button=new JButton("Connection");
+		button.setEnabled(false);
 		this.button.addMouseListener(new ConnListener());
 		add(this.button);
 	
@@ -65,8 +74,7 @@ public class ConnectPan extends JPanel{
 		this.host.setEnabled(enable);
 		this.port.setEnabled(enable);
 		
-		this.button.setName(enable ? "Connection" : "Deconnection");
-		this.button.updateUI();
+		this.button.setText(enable ? "Connection" : "Deconnection");
 	}
 	
 	public boolean isEnable(){
@@ -87,6 +95,32 @@ public class ConnectPan extends JPanel{
 	
 	protected void notifyDisconnect(){
 		for(ConnectListener listener : this.listeners) listener.needDisconnect();
+	}
+	
+	private class ListenText implements KeyListener{
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			ConnectPan th=ConnectPan.this;
+			if(th.isEnable()) th.button.setEnabled(!th.login.getText().isEmpty() 
+					&& th.passwd.getPassword().length!=0
+					&& !th.host.getText().isEmpty()
+					&& !th.port.getText().isEmpty());
+			
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 	
 	private class ConnListener implements MouseListener{
