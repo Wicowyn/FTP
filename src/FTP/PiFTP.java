@@ -33,7 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-
+/**
+ * Class that allow to dialog with an remote FTP server trough InputStream/OutputStream
+ * @author yapiti
+ *
+ */
 public class PiFTP{
 	private List<PiFTPListener> listeners=new ArrayList<PiFTPListener>();
 	private BufferedReader in;
@@ -43,10 +47,16 @@ public class PiFTP{
 	
 	
 	public PiFTP(InputStream in, OutputStream out) throws IOException{
-		setInputream(in);
+		setInputStream(in);
 		setOutputStream(out);		
 	}
 	
+	/**
+	 * Try to logging
+	 * @param id login of user
+	 * @param passwd password of user
+	 * @return success or not
+	 */
 	public boolean connect(String id, String passwd){
 		try {
 			if(!command("USER "+id).startsWith("331 ")) return false;
@@ -67,6 +77,11 @@ public class PiFTP{
 		return true;
 	}
 	
+	/**
+	 * Get remote file in the given path
+	 * @param path The directory
+	 * @return Files
+	 */
 	public synchronized List<FTPFile> getFiles(String path){
 		List<FTPFile> list=new ArrayList<FTPFile>();
 		List<String> listName=new ArrayList<String>(), listInfo=new ArrayList<String>();
@@ -157,11 +172,40 @@ public class PiFTP{
 		return list;
 	}
 	
-	public boolean rename(FTPFile file, String newName){
+	/**
+	 * Give the file focused by the given path, if it's not found return null;
+	 * @param path the absolute path
+	 * @return the file or null
+	 */
+	public synchronized FTPFile getFile(String path){
+		FTPFile fileR=null;
+		int index=path.lastIndexOf("/");
+		
+		if(index!=-1){
+			List<FTPFile> list=getFiles(path.substring(0, path.lastIndexOf("/")));
+			for(FTPFile fl : list) if(fl.getAbsPath().equals(path)) fileR=fl;
+		}
+		
+		return fileR;
+	}
+	
+	/**
+	 * Rename the file by the given name
+	 * @param file the file
+	 * @param newName his new name
+	 * @return success or not
+	 */
+	public synchronized boolean rename(FTPFile file, String newName){
 		return move(file, file.getAbsPath()+"/"+newName);
 	}
 	
-	public boolean move(FTPFile file, String newAbsPath){
+	/**
+	 * Move an file
+	 * @param file the file
+	 * @param newAbsPath his new absolute path
+	 * @return sucess or not
+	 */
+	public synchronized boolean move(FTPFile file, String newAbsPath){
 		try {
 			if(!command("RNFR "+new String(file.getAbsPath().getBytes(), "UTF-8")).startsWith("350")) return false;
 			if(!command("RNTO "+new String(newAbsPath.getBytes(), "UTF-8")).startsWith("250")) return false;
@@ -177,6 +221,11 @@ public class PiFTP{
 		return true;
 	}
 	
+	/**
+	 * Allow to download an remote file
+	 * @param file the file
+	 * @return can return null if the file is not found
+	 */
 	public InputStream download(FTPFile file){
 		InputStream in=null;
 		if(this.type!=Type.I) if(!setMode(Type.I)) return in;
@@ -195,6 +244,11 @@ public class PiFTP{
 		return in;
 	}
 	
+	/**
+	 * Allow to upload an file
+	 * @param absPath the remote absolute path
+	 * @return can return null in some case
+	 */
 	public OutputStream upload(String absPath){
 		OutputStream out=null;
 		if(this.type!=Type.I) if(!setMode(Type.I)) return out;
@@ -213,9 +267,14 @@ public class PiFTP{
 		return out;
 	}
 
+	/**
+	 * Delete the file
+	 * @param file the file
+	 * @return success or not
+	 */
 	public boolean delete(FTPFile file){
 		try {
-			if(!command("DELE "+new String(file.getAbsPath().getBytes(), "UTF-8")).startsWith("250")) return false;
+			if(!command((file.isDirectory() ? "RMD " : "DELE ")+new String(file.getAbsPath().getBytes(), "UTF-8")).startsWith("250")) return false;
 			file.exist=false;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -224,6 +283,10 @@ public class PiFTP{
 		return true;
 	}
 
+	/**
+	 * Return an socket to transfer data in passive mode
+	 * @return
+	 */
 	protected Socket PASV(){
 		Socket sock=null;	
 		String log;
@@ -241,15 +304,24 @@ public class PiFTP{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//System.out.println(sock==null);
+		
 		return sock;		
 	}
 	
-	
+	/**
+	 * We are connected?
+	 * @return yes or no
+	 */
 	public boolean isConnected(){
 		return this.connected;
 	}
 	
+	/**
+	 * Send an command to the server FTP
+	 * @param cmd the command
+	 * @return the reply
+	 * @throws IOException
+	 */
 	protected synchronized String command(String cmd) throws IOException{
 		while(this.in.ready()) notifyReceiveMsg(this.in.readLine()); //secure clearing
 		this.out.write(cmd+"\r\n");
@@ -282,6 +354,11 @@ public class PiFTP{
 		return str==null ? new String() : str;
 	}
 	
+	/**
+	 * Set the mode to transfer data
+	 * @param type The type
+	 * @return success or not
+	 */
 	protected boolean setMode(Type type){
 		try {
 			if(command("TYPE "+type).startsWith("200")){
@@ -295,11 +372,19 @@ public class PiFTP{
 		return false;		
 	}
 	
+	/**
+	 * Current mode to transfer data
+	 * @return the mode
+	 */
 	public Type getType(){
 		return this.type;
 	}
 	
-	protected void setInputream(InputStream in){
+	/**
+	 * Set the location where reply arrive (warning: you must clean the reply of welcome of FTP server)
+	 * @param in The InputStream
+	 */
+	public void setInputStream(InputStream in){
 		try {
 			if(this.in!=null) this.in.close();
 			this.in=new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -310,7 +395,11 @@ public class PiFTP{
 		}
 	}
 	
-	protected void setOutputStream(OutputStream out){
+	/**
+	 * Set the location where we must send issue to the server FTP
+	 * @param out
+	 */
+	public void setOutputStream(OutputStream out){
 		try {
 			if(this.out!=null) this.out.close();
 			this.out=new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
@@ -321,31 +410,54 @@ public class PiFTP{
 		}
 	}
 	
+	/**
+	 * Add an listener
+	 * @param listener the listener
+	 */
 	public void addLisener(PiFTPListener listener){
 		this.listeners.add(listener);
 	}
 	
+	/**
+	 * Remove an listener
+	 * @param listener the listener
+	 * @return find and removed or not
+	 */
 	public boolean removeListener(PiFTPListener listener){
 		return this.listeners.remove(listener);
 	}
 	
+	/**
+	 * Notify listeners
+	 * @param msg
+	 */
 	protected void notifyReceiveMsg(String msg){
 		for(PiFTPListener listener : this.listeners) listener.receiveMsg(msg);
 	}
 	
+	/**
+	 * Notify listeners
+	 * @param msg
+	 */
 	protected void notifySendMsg(String msg){
 		for(PiFTPListener listener : this.listeners) listener.sendMsg(msg);
 	}
 	
+	/**
+	 * Notify listeners
+	 */
 	protected void notifyConnected(){
 		for(PiFTPListener listener : this.listeners) listener.connected();
 	}
 	
+	/**
+	 * Notify listeners
+	 */
 	protected void notifyDisconnected(){
 		for(PiFTPListener listener : this.listeners) listener.disconnected();
 	}
 	
-	private enum Type{
+	public enum Type{
 		A, E, I, L
 	}
 	

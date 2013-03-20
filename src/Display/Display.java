@@ -1,14 +1,33 @@
+/*//////////////////////////////////////////////////////////////////////
+	This file is part of FTP, an client FTP.
+	Copyright (C) 2013  Nicolas Barranger <wicowyn@gmail.com>
+
+    FTP is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FTP is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FTP.  If not, see <http://www.gnu.org/licenses/>.
+*///////////////////////////////////////////////////////////////////////
+
 package Display;
 
 import java.awt.Dimension;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -83,18 +102,11 @@ public class Display extends JFrame {
 		@Override
 		public void selectedFile(String path) {
 			if(Display.this.pi==null) return;
-			FTPFile fileR=null;
-			System.out.println(path);
-			System.out.println(path.substring(0, path.lastIndexOf("/")));
-			List<FTPFile> list=Display.this.pi.getFiles(path.substring(0, path.lastIndexOf("/")));
-			for(FTPFile fl : list){
-				if(fl.getAbsPath().equals(path)){
-					System.out.println(path+" - "+fl.getAbsPath());
-					fileR=fl;
-				}
-			}
 			
+			FTPFile fileR=Display.this.pi.getFile(path);
+			if(fileR==null) return;
 			File fileL=new File(Display.this.expLocal.getCurrentPath()+"/"+fileR.getName());
+			
 			try {
 				TransferTask trf=new TransferTask(
 						Display.this.pi.download(fileR),
@@ -136,6 +148,9 @@ public class Display extends JFrame {
 		public void needConnect(String login, char[] passwd, String host, long port) {
 			try {
 				Socket sock=new Socket(host, (int) port);
+				
+				BufferedReader read=new BufferedReader(new InputStreamReader(sock.getInputStream()));
+				read.readLine(); //To clear the reply of welcome..., but we should find another way.
 				
 				PiFTP pi=new PiFTP(sock.getInputStream(), sock.getOutputStream());
 				pi.addLisener(new PiFTPListener() {
@@ -187,7 +202,14 @@ public class Display extends JFrame {
 			Display.this.pi=null;
 			Display.this.expFTP.setPiFTP(null);
 			
-			Display.this.sock=null;
+			if(Display.this.sock!=null){
+				try {
+					Display.this.sock.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				Display.this.sock=null;
+			}
 		}
 		
 	}
