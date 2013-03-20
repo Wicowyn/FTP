@@ -321,6 +321,13 @@ public class PiFTP{
 	}
 	
 	/**
+	 * Just set attr connected to false
+	 */
+	public void disconnect(){
+		this.connected=false;
+	}
+	
+	/**
 	 * Send an command to the server FTP
 	 * @param cmd the command
 	 * @return the reply

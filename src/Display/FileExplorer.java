@@ -19,6 +19,8 @@
 package Display;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -26,7 +28,9 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 public abstract class FileExplorer extends JPanel{
 	private static final long serialVersionUID = -5471662006897342640L;
@@ -34,21 +38,50 @@ public abstract class FileExplorer extends JPanel{
 	protected DefaultListModel<String> model=new DefaultListModel<String>();
 	protected JList<String> list=new JList<String>(this.model);
 	protected String path=new String();
-	
+	protected JPopupMenu menu=new JPopupMenu();
+	private int indxPopMenu=-1;
 	
 	public FileExplorer(){
 		setLayout(new BorderLayout());
 		this.list.addMouseListener(new ListenMouse());
 		this.add(this.list);
+		
+		JMenuItem itemSuppr=new JMenuItem("Supprimer");
+		itemSuppr.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				delete(FileExplorer.this.indxPopMenu);
+				
+			}
+		});
+		this.menu.add(itemSuppr);
+		
+		/*JMenuItem itemRename=new JMenuItem("Supprimer");
+		itemRename.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				rename(FileExplorer.this.indxPopMenu);
+				
+			}
+		});
+		this.menu.add(itemRename);*/
 	}
 	
 	public String getCurrentPath(){
 		return this.path;
 	}
 	
+	public void clear(){
+		this.model.clear();
+	}
+	
 	public abstract void setPath(String path);
 	
 	protected abstract void selected(int index);
+	
+	//protected abstract void rename(int index, String newName);
+	
+	protected abstract void delete(int index);
 	
 	public void addListener(FileExplorerListener listener){
 		this.listeners.add(listener);
@@ -68,13 +101,18 @@ public abstract class FileExplorer extends JPanel{
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			int index=FileExplorer.this.list.locationToIndex(e.getPoint());
-			if(index!=this.lastIndex) nbClick=0;
-			this.lastIndex=index;
-			this.nbClick++;
-			if(this.nbClick==2){
-				this.nbClick=0;
-				FileExplorer.this.selected(index);
+			if(e.getButton()==MouseEvent.BUTTON1){
+				int index=FileExplorer.this.list.locationToIndex(e.getPoint());
+				if(index!=this.lastIndex) this.nbClick=0;
+				this.lastIndex=index;
+				this.nbClick++;
+				if(this.nbClick==2){
+					this.nbClick=0;
+					FileExplorer.this.selected(index);
+				}
+			}
+			else{
+				this.lastIndex=-1;
 			}
 			
 		}
@@ -93,7 +131,10 @@ public abstract class FileExplorer extends JPanel{
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			//Todo nothing
+			if(e.isPopupTrigger()){
+				FileExplorer.this.indxPopMenu=FileExplorer.this.list.locationToIndex(e.getPoint());
+				FileExplorer.this.menu.show(e.getComponent(), e.getX(), e.getY());
+			}
 			
 		}
 

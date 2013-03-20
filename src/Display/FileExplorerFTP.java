@@ -72,4 +72,15 @@ public class FileExplorerFTP extends FileExplorer {
 		
 	}
 
+	@Override
+	protected void delete(int index) {
+		String name=this.model.get(index);
+		
+		if(!name.equals("..")){
+			this.pi.delete(this.pi.getFile(this.path+"/"+this.model.get(index)));
+			setPath(this.path);
+		}
+		
+	}
+
 }

@@ -85,8 +85,9 @@ public class Display extends JFrame {
 		
 		@Override
 		public void selectedFile(String path) {
-			if(Display.this.pi==null) return;
+			if(!Display.this.pi.isConnected()) return;
 			File file=new File(path);
+			
 			try {
 				TransferTask trf=new TransferTask(
 						new FileInputStream(file),
@@ -107,7 +108,7 @@ public class Display extends JFrame {
 		
 		@Override
 		public void selectedFile(String path) {
-			if(Display.this.pi==null) return;
+			if(!Display.this.pi.isConnected()) return;
 			
 			FTPFile fileR=Display.this.pi.getFile(path);
 			if(fileR==null) return;
@@ -162,6 +163,7 @@ public class Display extends JFrame {
 		@Override
 		public void needDisconnect() {
 			Display.this.expFTP.setPiFTP(null);
+			Display.this.expFTP.clear();
 			
 			if(Display.this.sock!=null){
 				try {
@@ -173,6 +175,7 @@ public class Display extends JFrame {
 			}
 			
 			Display.this.conn.setEnabled(true);
+			Display.this.pi.disconnect();
 		}
 		
 	}

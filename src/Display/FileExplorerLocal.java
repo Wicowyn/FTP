@@ -57,6 +57,19 @@ public class FileExplorerLocal extends FileExplorer {
 		}
 		
 	}
+
+
+	@Override
+	protected void delete(int index) {
+		String name=this.model.get(index);
+		
+		if(!name.equals("..")){
+			File file=new File(this.path+"/"+name);
+			file.delete();
+			setPath(this.path);
+		}
+		
+	}
 	
 	
 }
