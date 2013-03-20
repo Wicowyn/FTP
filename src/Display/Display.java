@@ -32,13 +32,11 @@ import java.net.UnknownHostException;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 
 import FTP.FTPFile;
 import FTP.PiFTP;
 import FTP.PiFTPListener;
 import FTP.TransferTask;
-import FTP.TransferTaskListener;
 
 public class Display extends JFrame {
 	private static final long serialVersionUID = -17473638218276059L;
@@ -47,7 +45,7 @@ public class Display extends JFrame {
 	private ConnectPan conn=new ConnectPan();
 	private FileExplorerLocal expLocal=new FileExplorerLocal();
 	private FileExplorerFTP expFTP=new FileExplorerFTP();
-	private JProgressBar progressBar=new JProgressBar();
+	private ShowProgress progress=new ShowProgress();
 	
 	public Display(){
 		JPanel pan=new JPanel();
@@ -63,8 +61,7 @@ public class Display extends JFrame {
 		panTree.add(this.expFTP);
 		pan.add(panTree);	
 		
-		pan.add(this.progressBar);
-		this.progressBar.setVisible(false);
+		pan.add(this.progress);
 		
 		this.conn.addListener(new ListenConnect());
 		this.expLocal.addListener(new ListenExpLocal());
@@ -82,15 +79,13 @@ public class Display extends JFrame {
 			try {
 				TransferTask trf=new TransferTask(
 						new FileInputStream(file),
-						Display.this.pi.upload(Display.this.expFTP.getCurrentPath()+"/"+file.getName()));
+						Display.this.pi.upload(Display.this.expFTP.getCurrentPath()+"/"+file.getName()),
+						file.length());
 				
-				ListenTransfert lt=new ListenTransfert();
-				lt.setSize((int) file.length());
-				trf.addListener(lt);
+				Display.this.progress.addTransferTask(trf);
 				
 				Thread th=new Thread(trf);
 				th.start();
-				Display.this.progressBar.setVisible(true);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -110,11 +105,10 @@ public class Display extends JFrame {
 			try {
 				TransferTask trf=new TransferTask(
 						Display.this.pi.download(fileR),
-						new FileOutputStream(fileL));
+						new FileOutputStream(fileL),
+						fileR.size());
 				
-				ListenTransfert lt=new ListenTransfert();
-				lt.setSize((int) fileR.size());
-				trf.addListener(lt);
+				Display.this.progress.addTransferTask(trf);
 				
 				Thread th=new Thread(trf);
 				th.start();
@@ -122,24 +116,6 @@ public class Display extends JFrame {
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	private class ListenTransfert implements TransferTaskListener{		
-		
-		public void setSize(int size){
-			Display.this.progressBar.setMaximum(size);
-		}
-		
-		@Override
-		public void transfered(long transfered) {
-			Display.this.progressBar.setValue((int) transfered);
-		}
-
-		@Override
-		public void finish() {
-			Display.this.progressBar.setVisible(false);
-		}
-		
 	}
 	
 	private class ListenConnect implements ConnectListener{

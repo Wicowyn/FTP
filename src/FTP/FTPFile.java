@@ -18,10 +18,6 @@
 
 package FTP;
 import java.util.Date;
-import java.util.List;
-
-import org.omg.CORBA.portable.OutputStream;
-
 
 
 public class FTPFile {
@@ -76,16 +72,11 @@ public class FTPFile {
 		return this.path+"/"+this.name;
 	}
 	
-	public List<FTPFile> list(){
-		return null;//isDirectory() ? FTPFile.getFiles(this.ftp, this.path+"/"+this.name) : null;
-	}
-	
 	public Date getDate(){
 		return this.date;
 	}
 	
-	public OutputStream getData(){
-		
-		return null;
+	public String getDuty(){
+		return this.duty;
 	}
 }

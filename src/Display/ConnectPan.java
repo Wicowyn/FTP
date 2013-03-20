@@ -35,9 +35,9 @@ import javax.swing.JTextField;
 public class ConnectPan extends JPanel{
 	private static final long serialVersionUID = 4707425225997730750L;
 	private List<ConnectListener> listeners=new ArrayList<ConnectListener>();
-	private JTextField login=new JTextField();
-	private JPasswordField passwd=new JPasswordField();
-	private JFormattedTextField host=new JFormattedTextField();
+	private JTextField login=new JTextField("yapiti");
+	private JPasswordField passwd=new JPasswordField("7sx6q8fs");
+	private JFormattedTextField host=new JFormattedTextField("192.168.0.126");
 	private JFormattedTextField port=new JFormattedTextField(DecimalFormat.getIntegerInstance());
 	private JButton button=new JButton("Connetion");
 	private boolean enabled=true;

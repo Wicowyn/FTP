@@ -30,10 +30,16 @@ public class TransferTask implements Runnable {
 	private List<TransferTaskListener> listeners=new ArrayList<TransferTaskListener>();
 	private BufferedInputStream in;
 	private BufferedOutputStream out;
+	private long size;
 	
-	public TransferTask(InputStream in, OutputStream out){
+	public TransferTask(InputStream in, OutputStream out, long size){
 		this.in=new BufferedInputStream(in);
 		this.out=new BufferedOutputStream(out);
+		this.size=size;
+	}
+	
+	public long getSize(){
+		return this.size;
 	}
 	
 	@Override
@@ -45,7 +51,7 @@ public class TransferTask implements Runnable {
 		try {
 			read=this.in.read(buff);
 
-			while(read!=-1){
+			while(read!=-1 && totalRead<this.size+1){
 				totalRead+=read;
 				notifyTransfered(totalRead);
 				this.out.write(buff, 0, read);

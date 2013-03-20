@@ -18,7 +18,6 @@
 
 package Display;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import FTP.FTPFile;
@@ -26,7 +25,7 @@ import FTP.PiFTP;
 
 public class FileExplorerFTP extends FileExplorer {
 	private static final long serialVersionUID = 5350246563844990461L;
-	private List<FTPFile> files=new ArrayList<FTPFile>();
+	//private List<FTPFile> files=new ArrayList<FTPFile>();
 	private PiFTP pi=null;
 
 	public FileExplorerFTP() {
@@ -37,12 +36,12 @@ public class FileExplorerFTP extends FileExplorer {
 	public void setPath(String path) {
 		this.path=path;
 		this.model.clear();
-		this.files.clear();
+		//this.files.clear();
 		if(this.pi==null) return;
 		
-		this.files=this.pi.getFiles(path);
+		List<FTPFile> files=this.pi.getFiles(path);
 		if(!this.path.isEmpty()) this.model.addElement("..");
-		for(FTPFile file : this.files){
+		for(FTPFile file : files){
 			this.model.addElement(file.getName());
 		}
 	}
@@ -50,7 +49,7 @@ public class FileExplorerFTP extends FileExplorer {
 	public void setPiFTP(PiFTP pi){
 		this.pi=pi;
 		this.model.clear();
-		this.files.clear();
+		//this.files.clear();
 	}
 	
 	public PiFTP getPiFTP(){
@@ -59,16 +58,18 @@ public class FileExplorerFTP extends FileExplorer {
 
 	@Override
 	protected void selected(int index) {
-		if(this.model.getElementAt(index).equals("..")){
+		if(this.model.get(index).equals("..")){
 			this.path=this.path.substring(0, this.path.lastIndexOf("/"));
 			this.setPath(path);
 		}
 		else{
-			FTPFile file=this.files.get(index);
+			String path=this.path+"/"+this.model.get(index);
+			FTPFile file=this.pi.getFile(path);
+			
 			if(file.isDirectory()){
 				setPath(file.getAbsPath());
 			}
-			else notifySelectedFile(file.getAbsPath());
+			else notifySelectedFile(path);
 
 		}
 		

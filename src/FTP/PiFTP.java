@@ -30,6 +30,7 @@ import java.net.Socket;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -131,9 +132,10 @@ public class PiFTP{
 			//after all... we can beginning
 			if(listName.size()!=listInfo.size()) return list; //or not?
 			SimpleDateFormat parseDTF=new SimpleDateFormat("yyyy MMM dd HH:mm", Locale.ENGLISH);
-			for(int i=0; i<listName.size(); i++){
+
+			for(String infos : listInfo){
+				String[] info=infos.split(" +"); //regex: un espace ou plus
 				FTPFile file=new FTPFile();
-				String[] info=listInfo.get(i).split(" +"); //regex: un espace ou plus
 				
 				file.exist=true;
 				file.duty=info[0];
@@ -145,12 +147,21 @@ public class PiFTP{
 					file.date=parseDTF.parse("2013 "+info[5]+" "+info[6]+" "+info[7]);
 				} catch (ParseException e) {
 					e.printStackTrace();
+					file.date=new Date();
+				}				
+				
+				for(String abs : listName){
+					int lastSlash=abs.lastIndexOf('/');
+					String pName=abs.substring(lastSlash+1, abs.length());
+					
+					if(infos.contains(pName)){
+						file.path= lastSlash<1 ? new String() : abs.substring(0, lastSlash);
+						file.name=pName;
+						
+						break;
+					}
 				}
 				
-				String abs=listName.get(i);
-				int lastSlash=abs.lastIndexOf('/');
-				file.path= lastSlash<1 ? "" : abs.substring(0, lastSlash-1);
-				file.name=abs.substring(abs.lastIndexOf('/')+1, abs.length());				
 				list.add(file);
 			}
 			
@@ -183,7 +194,10 @@ public class PiFTP{
 		
 		if(index!=-1){
 			List<FTPFile> list=getFiles(path.substring(0, path.lastIndexOf("/")));
-			for(FTPFile fl : list) if(fl.getAbsPath().equals(path)) fileR=fl;
+			for(FTPFile fl : list){
+				System.out.println(fl.getAbsPath()+" - "+path);
+				if(fl.getAbsPath().equals(path)) fileR=fl;
+			}
 		}
 		
 		return fileR;

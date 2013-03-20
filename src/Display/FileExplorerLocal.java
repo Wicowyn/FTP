@@ -48,6 +48,7 @@ public class FileExplorerLocal extends FileExplorer {
 		else{
 			path=path+"/"+this.model.get(index);
 			File file=new File(path);
+			
 			if(file.isDirectory()){
 				this.setPath(path);
 			}
