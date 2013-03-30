@@ -70,6 +70,19 @@ public class FileExplorerLocal extends FileExplorer {
 		}
 		
 	}
+
+
+	@Override
+	protected void move(int index, String newAbsPath) {
+		String name=this.model.get(index);
+		
+		if(!name.equals("..")){
+			File file=new File(this.path+"/"+name);
+			file.renameTo(new File(newAbsPath));
+			setPath(this.path);
+		}
+		
+	}
 	
 	
 }

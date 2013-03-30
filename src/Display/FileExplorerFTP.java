@@ -83,4 +83,15 @@ public class FileExplorerFTP extends FileExplorer {
 		
 	}
 
+	@Override
+	protected void move(int index, String newAbsPath) {
+		String name=this.model.get(index);
+		
+		if(!name.equals("..")){
+			this.pi.move(this.pi.getFile(this.path+"/"+this.model.get(index)), newAbsPath);
+			setPath(this.path);
+		}
+		
+	}
+
 }

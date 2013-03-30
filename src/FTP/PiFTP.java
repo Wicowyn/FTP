@@ -215,7 +215,7 @@ public class PiFTP{
 			if(!command("RNTO "+new String(newAbsPath.getBytes(), "UTF-8")).startsWith("250")) return false;
 			
 
-			file.path=newAbsPath.substring(0, newAbsPath.lastIndexOf('/')-1);
+			file.path=newAbsPath.substring(0, newAbsPath.lastIndexOf('/'));
 			file.name=newAbsPath.substring(newAbsPath.lastIndexOf('/')+1, newAbsPath.length());		
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -343,7 +343,7 @@ public class PiFTP{
 		try {
 			str=this.in.readLine();
 			
-			if(str.startsWith("530") && isConnected()){
+			if((str==null && isConnected()) || (str.startsWith("530") && isConnected())){
 				this.connected=false;
 				notifyDisconnected();
 			}

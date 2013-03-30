@@ -27,7 +27,7 @@ public class Main {
 		
 		Display disp=new Display();
 		disp.setSize(800, 600);
-		disp.setTitle("FTP :D");
+		disp.setTitle("FTP");
 		disp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		disp.setLocationRelativeTo(null);
 		

@@ -57,13 +57,13 @@ public class TransferTask implements Runnable {
 				this.out.write(buff, 0, read);
 				read=this.in.read(buff);
 
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {}
+				/*try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {}*/
 			}
 			
-			in.close();
-			out.close();
+			this.in.close();
+			this.out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

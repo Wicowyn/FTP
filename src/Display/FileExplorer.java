@@ -29,6 +29,7 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -65,6 +66,18 @@ public abstract class FileExplorer extends JPanel{
 			}
 		});
 		this.menu.add(itemRename);*/
+		
+		JMenuItem itemRename=new JMenuItem("Déplacer");
+		itemRename.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String path=JOptionPane.showInputDialog("Le nouveau chemin",
+						FileExplorer.this.path+"/"+FileExplorer.this.model.get(FileExplorer.this.indxPopMenu));
+				if(path!=null) move(FileExplorer.this.indxPopMenu, path);
+				
+			}
+		});
+		this.menu.add(itemRename);
 	}
 	
 	public String getCurrentPath(){
@@ -79,7 +92,7 @@ public abstract class FileExplorer extends JPanel{
 	
 	protected abstract void selected(int index);
 	
-	//protected abstract void rename(int index, String newName);
+	protected abstract void move(int index, String newAbsPath);
 	
 	protected abstract void delete(int index);
 	
