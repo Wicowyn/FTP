@@ -90,7 +90,7 @@ public class PiFTP{
 			if(sock==null) return list;
 			read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
-			if(!command("NLST "+new String(path.getBytes(), "UTF-8")).startsWith("150")) return list;
+			if(!command("NLST "+path).startsWith("150")) return list;
 			String str=read.readLine();
 			while(str!=null){
 				listName.add(str);
@@ -107,7 +107,7 @@ public class PiFTP{
 			sock=PASV();
 			if(sock==null) return list;
 			read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-			if(!command("LIST "+new String(path.getBytes(), "UTF-8")).startsWith("150")) return list;
+			if(!command("LIST "+path).startsWith("150")) return list;
 			
 			str=read.readLine();
 			while(str!=null){
@@ -211,8 +211,8 @@ public class PiFTP{
 	 */
 	public synchronized boolean move(FTPFile file, String newAbsPath){
 		try {
-			if(!command("RNFR "+new String(file.getAbsPath().getBytes(), "UTF-8")).startsWith("350")) return false;
-			if(!command("RNTO "+new String(newAbsPath.getBytes(), "UTF-8")).startsWith("250")) return false;
+			if(!command("RNFR "+file.getAbsPath()).startsWith("350")) return false;
+			if(!command("RNTO "+newAbsPath).startsWith("250")) return false;
 			
 
 			file.path=newAbsPath.substring(0, newAbsPath.lastIndexOf('/'));
@@ -237,7 +237,7 @@ public class PiFTP{
 		if(sock==null) return null;
 		
 		try {
-			String log=command("RETR "+new String(file.getAbsPath().getBytes(), "UTF-8"));
+			String log=command("RETR "+file.getAbsPath());
 			
 			if(log.startsWith("125") || log.startsWith("150") || log.startsWith("350"))
 					in=sock.getInputStream();
@@ -260,7 +260,7 @@ public class PiFTP{
 		if(sock==null) return null;
 		
 		try {
-			String log=command("STOR "+new String(absPath.getBytes(), "UTF-8"));
+			String log=command("STOR "+absPath);
 			
 			if(log.startsWith("125") || log.startsWith("150"))
 					out=sock.getOutputStream();
@@ -278,12 +278,23 @@ public class PiFTP{
 	 */
 	public boolean delete(FTPFile file){
 		try {
-			if(!command((file.isDirectory() ? "RMD " : "DELE ")+new String(file.getAbsPath().getBytes(), "UTF-8")).startsWith("250")) return false;
+			if(file.isDirectory()){
+				List<FTPFile> list=getFiles(file.getAbsPath());
+				
+				for(FTPFile oneFile : list)	if(!delete(oneFile)) return false;
+				
+				if(!command("RMD "+file.getAbsPath()).startsWith("250")) return false;
+			}
+			else{
+				if(!command("DELE "+file.getAbsPath()).startsWith("250")) return false;
+			}
+			
 			file.exist=false;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;		
 		}
+		
 		return true;
 	}
 
@@ -335,7 +346,7 @@ public class PiFTP{
 	 */
 	protected synchronized String command(String cmd) throws IOException{
 		while(this.in.ready()) notifyReceiveMsg(this.in.readLine()); //secure clearing
-		this.out.write(cmd+"\r\n");
+		this.out.write(new String(cmd.getBytes(), "UTF-8")+"\r\n");
 		this.out.flush();
 		notifySendMsg(cmd);
 

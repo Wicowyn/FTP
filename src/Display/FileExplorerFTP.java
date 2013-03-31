@@ -42,6 +42,8 @@ public class FileExplorerFTP extends FileExplorer {
 		for(FTPFile file : files){
 			this.model.addElement(file.getName());
 		}
+		
+		updateUI();
 	}
 	
 	public void setPiFTP(PiFTP pi){

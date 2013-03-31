@@ -33,6 +33,8 @@ public class FileExplorerLocal extends FileExplorer {
 		for(File file : fileRoot.listFiles()){
 			this.model.addElement(file.getName());
 		}
+		
+		updateUI();
 	}
 
 
