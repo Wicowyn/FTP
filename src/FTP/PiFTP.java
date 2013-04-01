@@ -80,7 +80,7 @@ public class PiFTP{
 	}
 	
 	protected FTPFile parseLine(String line){
-	SimpleDateFormat parseDTF=new SimpleDateFormat("yyyyMMddHHmm");
+		SimpleDateFormat parseDTF=new SimpleDateFormat("yyyyMMddHHmm");
 		FTPFile file=new FTPFile();
 		
 		try {
@@ -127,8 +127,7 @@ public class PiFTP{
 			read.close();
 			sock.close();
 			
-			str=this.in.readLine();
-			notifyReceiveMsg(str);
+			notifyReceiveMsg(this.in.readLine());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

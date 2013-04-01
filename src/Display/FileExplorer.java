@@ -57,15 +57,15 @@ public abstract class FileExplorer extends JPanel{
 		});
 		this.menu.add(itemSuppr);
 		
-		/*JMenuItem itemRename=new JMenuItem("Supprimer");
-		itemRename.addActionListener(new ActionListener() {
+		JMenuItem itemInfo=new JMenuItem("Infos");
+		itemInfo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				rename(FileExplorer.this.indxPopMenu);
+				info(FileExplorer.this.indxPopMenu);
 				
 			}
 		});
-		this.menu.add(itemRename);*/
+		this.menu.add(itemInfo);
 		
 		JMenuItem itemRename=new JMenuItem("Déplacer");
 		itemRename.addActionListener(new ActionListener() {
@@ -95,6 +95,8 @@ public abstract class FileExplorer extends JPanel{
 	protected abstract void move(int index, String newAbsPath);
 	
 	protected abstract void delete(int index);
+	
+	protected abstract void info(int index);
 	
 	public void addListener(FileExplorerListener listener){
 		this.listeners.add(listener);

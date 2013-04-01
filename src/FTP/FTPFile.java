@@ -37,12 +37,16 @@ public class FTPFile {
 		
 	}
 	
-	public int getOwner(){
+	public int getUnixOwner(){
 		return this.owner;
 	}
 	
-	public int getOwnerGroup(){
+	public int getUnixGroup(){
 		return this.ownerGroup;
+	}
+	
+	public String getType(){
+		return this.type;
 	}
 	
 	public int getMode(){

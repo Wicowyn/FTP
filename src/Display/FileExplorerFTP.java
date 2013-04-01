@@ -88,4 +88,22 @@ public class FileExplorerFTP extends FileExplorer {
 		
 	}
 
+	@Override
+	protected void info(int index) {
+		FTPFile file=this.pi.getFile(this.path+"/"+this.model.get(index));
+		ShowInfo inf=new ShowInfo();
+		
+		inf.setDir(file.getPath());
+		inf.setName(file.getName());
+		inf.setTypeFile(file.getType());
+		inf.setSize(file.size());
+		inf.setDate(file.getDate());
+		inf.setPerm(file.getPerm());
+		inf.setUnixOwner(Integer.toString(file.getUnixOwner()));
+		inf.setUnixGroup(Integer.toString(file.getUnixGroup()));
+		
+		inf.setVisible(true);
+		inf.setLocationRelativeTo(this);
+	}
+
 }

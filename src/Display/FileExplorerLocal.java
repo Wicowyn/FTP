@@ -19,6 +19,7 @@
 package Display;
 
 import java.io.File;
+import java.util.Date;
 
 public class FileExplorerLocal extends FileExplorer {
 	private static final long serialVersionUID = 5791387224671240515L;
@@ -84,6 +85,25 @@ public class FileExplorerLocal extends FileExplorer {
 			setPath(this.path);
 		}
 		
+	}
+
+
+	@Override
+	protected void info(int index) {
+		File file=new File(this.path+"/"+this.model.get(index));
+		ShowInfo inf=new ShowInfo();
+		
+		inf.setDir(file.getPath());
+		inf.setName(file.getName());
+		inf.setTypeFile(file.isDirectory() ? "dir" : "file");
+		inf.setSize(file.length());
+		inf.setDate(new Date(file.lastModified()));
+		/*inf.setPerm(file.getPerm());
+		inf.setUnixOwner(Integer.toString(file.getUnixOwner()));
+		inf.setUnixGroup(Integer.toString(file.getUnixGroup()));*/
+		
+		inf.setLocationRelativeTo(this);
+		inf.setVisible(true);
 	}
 	
 	
