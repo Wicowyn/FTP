@@ -30,9 +30,7 @@ import java.net.Socket;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Class that allow to dialog with an remote FTP server trough InputStream/OutputStream
@@ -73,6 +71,34 @@ public class PiFTP{
 		return true;
 	}
 	
+	protected String getVal(String line, String name){
+		int indxF=line.indexOf(name);
+		if(indxF==-1) return null;
+		int indxL=line.indexOf(';', indxF);
+		
+		return line.substring(indxF+name.length()+1, indxL);
+	}
+	
+	protected FTPFile parseLine(String line){
+	SimpleDateFormat parseDTF=new SimpleDateFormat("yyyyMMddHHmm");
+		FTPFile file=new FTPFile();
+		
+		try {
+			file.date=parseDTF.parse(getVal(line, "modify"));
+		} catch (ParseException e) {
+			System.err.println(e.getMessage());
+		}
+		file.perm=getVal(line, "perm");
+		file.type=getVal(line, "type");
+		if(!file.isDirectory()) file.size=Long.parseLong(getVal(line, "size"));
+		file.absPath=line.substring(line.lastIndexOf("; ")+2, line.length());
+		if(line.contains("UNIX.owner")) file.owner=Integer.parseInt(getVal(line, "UNIX.owner"));
+		if(line.contains("UNIX.group")) file.owner=Integer.parseInt(getVal(line, "UNIX.group"));
+		if(line.contains("UNIX.mode")) file.owner=Integer.parseInt(getVal(line, "UNIX.mode"));
+		
+		return file;
+	}
+	
 	/**
 	 * Get remote file in the given path
 	 * @param path The directory
@@ -80,97 +106,31 @@ public class PiFTP{
 	 */
 	public synchronized List<FTPFile> getFiles(String path){
 		List<FTPFile> list=new ArrayList<FTPFile>();
-		List<String> listName=new ArrayList<String>(), listInfo=new ArrayList<String>();
-		Socket sock=null;
-		BufferedReader read=null;
 		
-		if(this.type!=Type.A) if(!setMode(Type.A)) return list;
+		if(this.type!=Type.A) setMode(Type.A);
+		Socket sock=PASV();
+		if(sock==null) return list;
+		
 		try {
-			sock=PASV();
-			if(sock==null) return list;
-			read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-
-			if(!command("NLST "+path).startsWith("150")) return list;
+			BufferedReader read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			if(!command("MLSD "+path).startsWith("150")) return list;
+			
 			String str=read.readLine();
 			while(str!=null){
-				listName.add(str);
-				str=read.readLine();
-			}
-			
-			read.close();
-			sock.close();
-			
-			str=this.in.readLine();
-			notifyReceiveMsg(str);
-			if(!str.startsWith("226")) return list;
-			
-			sock=PASV();
-			if(sock==null) return list;
-			read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-			if(!command("LIST "+path).startsWith("150")) return list;
-			
-			str=read.readLine();
-			while(str!=null){
-				listInfo.add(str);
-				str=read.readLine();
-			}
-			
-			read.close();
-			sock.close();
-			
-			str=this.in.readLine();
-			notifyReceiveMsg(str);
-			if(!str.startsWith("226")) return list;
-			
-			//after all... we can beginning
-			if(listName.size()!=listInfo.size()) return list; //or not?
-			SimpleDateFormat parseDTF=new SimpleDateFormat("yyyy MMM dd HH:mm", Locale.ENGLISH);
-
-			for(String infos : listInfo){
-				String[] info=infos.split(" +"); //regex: un espace ou plus
-				FTPFile file=new FTPFile();
-				
+				FTPFile file=parseLine(str);
 				file.exist=true;
-				file.duty=info[0];
-				file.owner=info[2];
-				file.ownerGroup=info[3];
-				file.size=Long.parseLong(info[4]);
-				
-				try {
-					file.date=parseDTF.parse("2013 "+info[5]+" "+info[6]+" "+info[7]);
-				} catch (ParseException e) {
-					System.err.println(e.getMessage());
-					file.date=new Date();
-				}				
-				
-				for(String abs : listName){
-					int lastSlash=abs.lastIndexOf('/');
-					String pName=abs.substring(lastSlash+1, abs.length());
-					
-					if(infos.contains(pName)){
-						file.path= lastSlash<1 ? new String() : abs.substring(0, lastSlash);
-						file.name=pName;
-						
-						break;
-					}
-				}
 				
 				list.add(file);
+				str=read.readLine();
 			}
 			
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} finally{
-			try {
-				if(read!=null) read.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			try {
-				if(sock!=null) sock.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			read.close();
+			sock.close();
+			
+			str=this.in.readLine();
+			notifyReceiveMsg(str);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		return list;
@@ -182,15 +142,22 @@ public class PiFTP{
 	 * @return the file or null
 	 */
 	public synchronized FTPFile getFile(String path){
-		FTPFile fileR=null;
-		int index=path.lastIndexOf("/");
-		
-		if(index!=-1){
-			List<FTPFile> list=getFiles(path.substring(0, path.lastIndexOf("/")));
-			for(FTPFile fl : list) if(fl.getAbsPath().equals(path)) fileR=fl;
+		FTPFile file=null;
+				
+		try {
+			if(command("MLST "+path).startsWith("250-")){
+				String line=this.in.readLine();
+				file=parseLine(line.substring(4, line.length()));
+				file.exist=true;
+				
+				notifyReceiveMsg(line);
+				notifyReceiveMsg(this.in.readLine());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
-		return fileR;
+		return file;
 	}
 	
 	/**
@@ -215,8 +182,7 @@ public class PiFTP{
 			if(!command("RNTO "+newAbsPath).startsWith("250")) return false;
 			
 
-			file.path=newAbsPath.substring(0, newAbsPath.lastIndexOf('/'));
-			file.name=newAbsPath.substring(newAbsPath.lastIndexOf('/')+1, newAbsPath.length());		
+			file.absPath=newAbsPath;	
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -230,7 +196,7 @@ public class PiFTP{
 	 * @param file the file
 	 * @return can return null if the file is not found
 	 */
-	public InputStream download(FTPFile file){
+	public synchronized InputStream download(FTPFile file){
 		InputStream in=null;
 		if(this.type!=Type.I) if(!setMode(Type.I)) return in;
 		Socket sock=PASV();
@@ -253,7 +219,7 @@ public class PiFTP{
 	 * @param absPath the remote absolute path
 	 * @return can return null in some case
 	 */
-	public OutputStream upload(String absPath){
+	public synchronized OutputStream upload(String absPath){
 		OutputStream out=null;
 		if(this.type!=Type.I && !setMode(Type.I)) return out;
 		Socket sock=PASV();
@@ -353,7 +319,6 @@ public class PiFTP{
 		String str;
 		try {
 			str=this.in.readLine();
-			
 			if((str==null && isConnected()) || (str.startsWith("530") && isConnected())){
 				this.connected=false;
 				notifyDisconnected();
@@ -371,7 +336,7 @@ public class PiFTP{
 			
 			throw e;
 		}
-		while(this.in.ready()) notifyReceiveMsg(this.in.readLine()); //secure clearing
+		//while(this.in.ready()) notifyReceiveMsg(this.in.readLine()); //secure clearing
 		
 		return str==null ? new String() : str;
 	}

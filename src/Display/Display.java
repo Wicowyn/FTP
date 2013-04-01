@@ -147,7 +147,7 @@ public class Display extends JFrame {
 					Display.this.conn.setEnabled(false);
 					Display.this.sock=sock;
 					Display.this.expFTP.setPiFTP(pi);
-					Display.this.expFTP.setPath("");
+					Display.this.expFTP.setPath("/");
 				}
 				else{
 					Display.this.conn.setEnabled(true);

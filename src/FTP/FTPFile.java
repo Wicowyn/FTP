@@ -22,12 +22,13 @@ import java.util.Date;
 
 public class FTPFile {
 	//private PiFTP ftp;
-	protected String owner;
-	protected String ownerGroup;
+	protected int owner;
+	protected int ownerGroup;
+	protected int mode;
+	protected String perm;
 	protected long size;
-	protected String duty; //linux-like
-	protected String name;
-	protected String path;
+	protected String type; //linux-like
+	protected String absPath;
 	protected Date date;
 	boolean exist=false;
 	
@@ -36,12 +37,20 @@ public class FTPFile {
 		
 	}
 	
-	public String getOwner(){
+	public int getOwner(){
 		return this.owner;
 	}
 	
-	public String getOwnerGroup(){
+	public int getOwnerGroup(){
 		return this.ownerGroup;
+	}
+	
+	public int getMode(){
+		return this.mode;
+	}
+	
+	public String getPerm(){
+		return this.perm;
 	}
 	
 	public long size(){
@@ -49,7 +58,7 @@ public class FTPFile {
 	}
 	
 	public boolean isDirectory(){
-		return this.duty.startsWith("d");
+		return this.type.equals("dir") || this.type.equals("cdir") || this.type.equals("pdir");
 	}
 	
 	public boolean exist(){
@@ -57,26 +66,24 @@ public class FTPFile {
 	}
 	
 	public boolean isSimlik(){
-		return this.duty.startsWith("l");
+		return false;//this.duty.startsWith("l");
 	}
 	
 	public String getPath(){
-		return this.path;
+		int indx=this.absPath.lastIndexOf("/");
+		return indx==-1 || indx==0 ? "/" : this.absPath.substring(0,  indx);
 	}
 	
 	public String getName(){
-		return this.name;
+		int indx=this.absPath.lastIndexOf("/");
+		return indx==-1 ? new String(this.absPath) : this.absPath.substring(indx+1, this.absPath.length());
 	}
 	
 	public String getAbsPath(){
-		return this.path+"/"+this.name;
+		return this.absPath;
 	}
 	
 	public Date getDate(){
 		return this.date;
-	}
-	
-	public String getDuty(){
-		return this.duty;
 	}
 }
