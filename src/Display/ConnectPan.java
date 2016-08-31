@@ -43,16 +43,18 @@ public class ConnectPan extends JPanel{
 	private JFormattedTextField port=new JFormattedTextField(DecimalFormat.getIntegerInstance());
 	private JButton button=new JButton("Connetion");
 	private boolean enabled=true;
+	private Language lang;
 	
 	public ConnectPan(){
+		lang = new Language();
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		add(new JLabel("Login: "));
+		add(new JLabel(lang.getPhrase(Language.LOGIN)));
 		add(this.login);
-		add(new JLabel("Mot de passe: "));
+		add(new JLabel(lang.getPhrase(Language.PASSWORD)));
 		add(this.passwd);
-		add(new JLabel("Host: "));
+		add(new JLabel(lang.getPhrase(Language.HOST)));
 		add(this.host);
-		add(new JLabel("Port: "));
+		add(new JLabel(lang.getPhrase(Language.PORT)));
 		add(this.port);
 		
 		ListenText lst=new ListenText();
@@ -63,7 +65,7 @@ public class ConnectPan extends JPanel{
 		
 		this.port.setValue(new Long(21));
 		
-		this.button=new JButton("Connection");
+		this.button=new JButton(lang.getPhrase(Language.CONNECT));
 		button.setEnabled(false);
 		this.button.addMouseListener(new ConnListener());
 		add(this.button);
@@ -75,9 +77,9 @@ public class ConnectPan extends JPanel{
 		this.passwd.setEnabled(enable);
 		this.host.setEnabled(enable);
 		this.port.setEnabled(enable);
-		
-		this.button.setText(enable ? "Connection" : "Deconnection");
-		
+		this.button.setText(
+				enable ? lang.getPhrase(Language.CONNECTED) : lang.getPhrase(Language.DISCONNECTED)
+						);		
 		this.enabled=enable;
 	}
 	
