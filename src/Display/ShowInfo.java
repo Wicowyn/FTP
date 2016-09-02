@@ -14,20 +14,22 @@ public class ShowInfo extends JDialog {
 	private JLabel name=new JLabel(), path=new JLabel(), size=new JLabel(),
 			owner=new JLabel(), group=new JLabel(), type=new JLabel(),
 			date=new JLabel(), perm=new JLabel();
+	private Language lang;
 	
 	public ShowInfo(){
+		lang = new Language();
 		JPanel left=new JPanel();
 		left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
 		
-		left.add(new JLabel("Directory: "));
-		left.add(new JLabel("Name: "));
-		left.add(new JLabel("Type: "));
-		left.add(new JLabel("Size: "));
-		left.add(new JLabel("Date: "));
-		left.add(new JLabel("Permissions: "));
-		left.add(new JLabel("UNIX owner: "));
-		left.add(new JLabel("UNIX group: "));
-		
+		left.add(new JLabel(lang.getPhrase(Language.INFO_DIR)));
+		left.add(new JLabel(lang.getPhrase(Language.INFO_NAME)));
+		left.add(new JLabel(lang.getPhrase(Language.INFO_TYPE)));
+		left.add(new JLabel(lang.getPhrase(Language.INFO_SIZE)));
+		left.add(new JLabel(lang.getPhrase(Language.INFO_DATE)));
+		left.add(new JLabel(lang.getPhrase(Language.INFO_PERM)));
+		left.add(new JLabel(lang.getPhrase(Language.INFO_OWNER)));
+		left.add(new JLabel(lang.getPhrase(Language.INFO_GROUP)));
+				
 		JPanel right=new JPanel();
 		right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
 		

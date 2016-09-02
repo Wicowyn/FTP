@@ -41,13 +41,15 @@ public abstract class FileExplorer extends JPanel{
 	protected String path=new String();
 	protected JPopupMenu menu=new JPopupMenu();
 	private int indxPopMenu=-1;
+	private Language lang;
 	
 	public FileExplorer(){
+		lang = new Language();
 		setLayout(new BorderLayout());
 		this.list.addMouseListener(new ListenMouse());
 		this.add(this.list);
 		
-		JMenuItem itemSuppr=new JMenuItem("Supprimer");
+		JMenuItem itemSuppr=new JMenuItem(lang.getPhrase(Language.DELETE));
 		itemSuppr.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -57,7 +59,7 @@ public abstract class FileExplorer extends JPanel{
 		});
 		this.menu.add(itemSuppr);
 		
-		JMenuItem itemInfo=new JMenuItem("Infos");
+		JMenuItem itemInfo=new JMenuItem(lang.getPhrase(Language.INFO));
 		itemInfo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -67,11 +69,11 @@ public abstract class FileExplorer extends JPanel{
 		});
 		this.menu.add(itemInfo);
 		
-		JMenuItem itemRename=new JMenuItem("Déplacer");
+		JMenuItem itemRename=new JMenuItem(lang.getPhrase(Language.MOVE));
 		itemRename.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String path=JOptionPane.showInputDialog("Le nouveau chemin",
+				String path=JOptionPane.showInputDialog(lang.getPhrase(Language.NEWFOLDER),
 						FileExplorer.this.path+"/"+FileExplorer.this.model.get(FileExplorer.this.indxPopMenu));
 				if(path!=null) move(FileExplorer.this.indxPopMenu, path);
 				
