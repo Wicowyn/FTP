@@ -56,10 +56,6 @@ public class TransferTask implements Runnable {
 				notifyTransfered(totalRead);
 				this.out.write(buff, 0, read);
 				read=this.in.read(buff);
-
-				/*try {
-					Thread.sleep(50);
-				} catch (InterruptedException e) {}*/
 			}
 			
 			this.in.close();

@@ -27,7 +27,7 @@ public class FileExplorerLocal extends FileExplorer {
 	
 	public void setPath(String path){
 		this.path=path;
-		File fileRoot=new File(this.path+"/");
+		File fileRoot=new File(this.path + Constants.FILE_SEPARATOR);
 		this.model.clear();
 		
 		if(!this.path.isEmpty()) this.model.addElement("..");
@@ -45,11 +45,11 @@ public class FileExplorerLocal extends FileExplorer {
 		String name=this.model.get(index);
 		
 		if(name.equals("..")){
-			path=path.substring(0, path.lastIndexOf("/"));
+			path=path.substring(0, path.lastIndexOf(Constants.FILE_SEPARATOR));
 			this.setPath(path);
 		}
 		else{
-			path=path+"/"+this.model.get(index);
+			path=path + Constants.FILE_SEPARATOR + this.model.get(index);
 			File file=new File(path);
 			
 			if(file.isDirectory()){
@@ -67,7 +67,7 @@ public class FileExplorerLocal extends FileExplorer {
 		String name=this.model.get(index);
 		
 		if(!name.equals("..")){
-			File file=new File(this.path+"/"+name);
+			File file=new File(this.path + Constants.FILE_SEPARATOR + name);
 			file.delete();
 			setPath(this.path);
 		}
@@ -90,7 +90,7 @@ public class FileExplorerLocal extends FileExplorer {
 
 	@Override
 	protected void info(int index) {
-		File file=new File(this.path+"/"+this.model.get(index));
+		File file=new File(this.path + Constants.FILE_SEPARATOR + this.model.get(index));
 		ShowInfo inf=new ShowInfo();
 		
 		inf.setDir(file.getPath());

@@ -2,16 +2,32 @@ package Display;
 
 public class Language {
 
-	static final int LOGIN = 1, PASSWORD = 2, HOST = 3, PORT = 4, CONNECT = 5, CONNECTED = 6, DISCONNECTED = 7,
-			DELETE = 8, INFO = 9, MOVE = 10, NEWFOLDER = 11, INFO_DIR = 12, INFO_NAME = 13, INFO_TYPE = 14,
-			INFO_SIZE = 14, INFO_DATE = 15, INFO_PERM = 16, INFO_OWNER = 17, INFO_GROUP = 18;
+	static final int LOGIN = 1;
+	static final int PASSWORD = 2;
+	static final int HOST = 3;
+	static final int PORT = 4;
+	static final int CONNECT = 5;
+	static final int CONNECTED = 6;
+	static final int DISCONNECTED = 7;
+	static final int DELETE = 8;
+	static final int INFO = 9;
+	static final int MOVE = 10;
+	static final int NEWFOLDER = 11;
+	static final int INFO_DIR = 12;
+	static final int INFO_NAME = 13;
+	static final int INFO_TYPE = 14;
+	static final int INFO_SIZE = 14;
+	static final int INFO_DATE = 15;
+	static final int INFO_PERM = 16;
+	static final int INFO_OWNER = 17;
+	static final int INFO_GROUP = 18;
 
 	String lang;
-	String[] lang_en = { "ENGLISH", "User: ", "Password: ", "Host: ", "Port: ", "Connect", "Connected", "Disconnected",
+	String[] langEn = { "ENGLISH", "User: ", "Password: ", "Host: ", "Port: ", "Connect", "Connected", "Disconnected",
 			"Delete", "Info", "Move", "New Folder", "Directory: ", "Name: ", "Type: ", "Date: ", "Permissions: ",
 			"Owner: ", "Group: " };
 
-	String[] lang_fr = { "FRANÇAIS", "Identifiant: ", "Mot De Passe: ", "Serveur: ", "Port: ", "Connecter", "Connecté",
+	String[] langFr = { "FRANÇAIS", "Identifiant: ", "Mot De Passe: ", "Serveur: ", "Port: ", "Connecter", "Connecté",
 			"Deconnecté", "Supprimer", "Renseignement", "Déplacer", "Nouveau Dossier", "Dossier: ", "Nom: ", "Type: ",
 			"Date: ", "Accès: ", "Propriétaire: ", "Groupe: " };
 
@@ -19,19 +35,20 @@ public class Language {
 		lang = System.getProperty("user.language");
 	}
 
-	public Language(String l) {
-		l = lang;
+	public Language(String lang) {
+		lang = this.lang;
 	}
 
 	public String getPhrase(int phrase) {
 		switch (lang) {
 		case "en":
-			return lang_en[phrase];
+			return langEn[phrase];
 		case "fr":
-			return lang_fr[phrase];
-
+			return langFr[phrase];
+		default:
+			return "unspecified";
 		}
-		return "unspecified";
+
 	}
 
 }

@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -112,7 +111,7 @@ public class Display extends JFrame {
 			
 			FTPFile fileR=Display.this.pi.getFile(path);
 			if(fileR==null) return;
-			File fileL=new File(Display.this.expLocal.getCurrentPath()+"/"+fileR.getName());
+			File fileL=new File(Display.this.expLocal.getCurrentPath()+ Constants.FILE_SEPARATOR +fileR.getName());
 			
 			try {
 				TransferTask trf=new TransferTask(
@@ -134,28 +133,35 @@ public class Display extends JFrame {
 
 		@Override
 		public void needConnect(String login, char[] passwd, String host, long port) {
+			BufferedReader read = null;
 			try {
-				Socket sock=new Socket(host, (int) port);
+				Socket socket=new Socket(host, (int) port);
 				
-				BufferedReader read=new BufferedReader(new InputStreamReader(sock.getInputStream()));
+				read =new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				read.readLine(); //To clear the reply of welcome..., but we should find another way.
 				
-				Display.this.pi.setInputStream(sock.getInputStream());
-				Display.this.pi.setOutputStream(sock.getOutputStream());
+				Display.this.pi.setInputStream(socket.getInputStream());
+				Display.this.pi.setOutputStream(socket.getOutputStream());
 				
 				if(Display.this.pi.connect(login, new String(passwd))){
 					Display.this.conn.setEnabled(false);
-					Display.this.sock=sock;
+					Display.this.sock=socket;
 					Display.this.expFTP.setPiFTP(pi);
 					Display.this.expFTP.setPath("/");
 				}
 				else{
 					Display.this.conn.setEnabled(true);
 				}
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
+			} finally {
+				if (read != null) {
+					try {
+						read.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 			
 		}
