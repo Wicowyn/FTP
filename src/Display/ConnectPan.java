@@ -36,7 +36,7 @@ import javax.swing.JTextField;
 
 public class ConnectPan extends JPanel{
 	private static final long serialVersionUID = 4707425225997730750L;
-	private List<ConnectListener> listeners=new ArrayList<ConnectListener>();
+	private List<ConnectListener> listeners = new ArrayList<>();
 	private JTextField login=new JTextField();
 	private JPasswordField passwd=new JPasswordField();
 	private JFormattedTextField host=new JFormattedTextField();
@@ -63,7 +63,7 @@ public class ConnectPan extends JPanel{
 		this.host.addKeyListener(lst);
 		this.port.addKeyListener(lst);
 		
-		this.port.setValue(new Long(21));
+		this.port.setValue(Long.valueOf(21));
 		
 		this.button=new JButton(lang.getPhrase(Language.CONNECT));
 		button.setEnabled(false);
@@ -72,6 +72,7 @@ public class ConnectPan extends JPanel{
 	
 	}
 	
+	@Override
 	public void setEnabled(boolean enable){
 		this.login.setEnabled(enable);
 		this.passwd.setEnabled(enable);

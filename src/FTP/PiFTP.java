@@ -38,7 +38,7 @@ import java.util.List;
  *
  */
 public class PiFTP{
-	private List<PiFTPListener> listeners=new ArrayList<PiFTPListener>();
+	private List<PiFTPListener> listeners = new ArrayList<>();
 	private BufferedReader in;
 	private BufferedWriter out;
 	private boolean connected=false;
@@ -105,7 +105,7 @@ public class PiFTP{
 	 * @return Files
 	 */
 	public synchronized List<FTPFile> getFiles(String path){
-		List<FTPFile> list=new ArrayList<FTPFile>();
+		List<FTPFile> list=new ArrayList<>();
 		
 		if(this.type!=Type.A) setMode(Type.A);
 		Socket sock=PASV();
@@ -318,7 +318,7 @@ public class PiFTP{
 		String str;
 		try {
 			str=this.in.readLine();
-			if((str==null && isConnected()) || (str.startsWith("530") && isConnected())){
+			if((str==null && isConnected()) || (str != null && str.startsWith("530") && isConnected())){
 				this.connected=false;
 				notifyDisconnected();
 			}

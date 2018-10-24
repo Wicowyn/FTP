@@ -19,6 +19,8 @@
 package FTP;
 import java.util.Date;
 
+import Display.Constants;
+
 
 public class FTPFile {
 	//private PiFTP ftp;
@@ -70,16 +72,16 @@ public class FTPFile {
 	}
 	
 	public boolean isSimlik(){
-		return false;//this.duty.startsWith("l");
+		return false;
 	}
 	
 	public String getPath(){
-		int indx=this.absPath.lastIndexOf("/");
+		int indx=this.absPath.lastIndexOf(Constants.FILE_SEPARATOR);
 		return indx==-1 || indx==0 ? "/" : this.absPath.substring(0,  indx);
 	}
 	
 	public String getName(){
-		int indx=this.absPath.lastIndexOf("/");
+		int indx=this.absPath.lastIndexOf(Constants.FILE_SEPARATOR);
 		return indx==-1 ? new String(this.absPath) : this.absPath.substring(indx+1, this.absPath.length());
 	}
 	

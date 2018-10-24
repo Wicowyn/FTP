@@ -35,10 +35,10 @@ import javax.swing.JPopupMenu;
 
 public abstract class FileExplorer extends JPanel{
 	private static final long serialVersionUID = -5471662006897342640L;
-	private List<FileExplorerListener> listeners=new ArrayList<FileExplorerListener>();
-	protected DefaultListModel<String> model=new DefaultListModel<String>();
-	protected JList<String> list=new JList<String>(this.model);
-	protected String path=new String();
+	private List<FileExplorerListener> listeners = new ArrayList<>();
+	protected DefaultListModel<String> model = new DefaultListModel<>();
+	protected JList<String> list = new JList<>(this.model);
+	protected String path= "";
 	protected JPopupMenu menu=new JPopupMenu();
 	private int indxPopMenu=-1;
 	private Language lang;
@@ -73,9 +73,9 @@ public abstract class FileExplorer extends JPanel{
 		itemRename.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String path=JOptionPane.showInputDialog(lang.getPhrase(Language.NEWFOLDER),
-						FileExplorer.this.path+"/"+FileExplorer.this.model.get(FileExplorer.this.indxPopMenu));
-				if(path!=null) move(FileExplorer.this.indxPopMenu, path);
+				String actionPath=JOptionPane.showInputDialog(lang.getPhrase(Language.NEWFOLDER),
+						FileExplorer.this.path + Constants.FILE_SEPARATOR + FileExplorer.this.model.get(FileExplorer.this.indxPopMenu));
+				if(actionPath!=null) move(FileExplorer.this.indxPopMenu, actionPath);
 				
 			}
 		});

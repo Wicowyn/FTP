@@ -11,9 +11,15 @@ import javax.swing.JPanel;
 
 public class ShowInfo extends JDialog {
 	private static final long serialVersionUID = -8863042376712432296L;
-	private JLabel name=new JLabel(), path=new JLabel(), size=new JLabel(),
-			owner=new JLabel(), group=new JLabel(), type=new JLabel(),
-			date=new JLabel(), perm=new JLabel();
+	
+	private JLabel name = new JLabel();
+	private JLabel path = new JLabel();
+	private JLabel size = new JLabel();
+	private JLabel owner = new JLabel(); 
+	private JLabel group = new JLabel(); 
+	private JLabel type = new JLabel();
+	private JLabel date = new JLabel();
+	private JLabel perm = new JLabel();
 	private Language lang;
 	
 	public ShowInfo(){
@@ -53,6 +59,7 @@ public class ShowInfo extends JDialog {
 		this.path.setText(dir);
 	}
 	
+	@Override
 	public void setName(String name){
 		this.name.setText(name);
 	}
